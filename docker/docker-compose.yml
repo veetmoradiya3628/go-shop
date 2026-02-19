@@ -99,3 +99,4 @@ services:
 volumes:
     postgres_data:
     localstack_data:
+    # mailpit_data:
