@@ -18,23 +18,27 @@ import (
 )
 
 func main() {
+
 	log := logger.New()
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to load configuration")
+		log.Fatal().Err(err).Msg("failed to load config")
 	}
+
 	db, err := database.New(&cfg.Database)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to connect to database")
+		log.Fatal().Err(err).Msg("failed to connect to database")
 	}
+
 	mainDB, err := db.DB()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to get database instance")
+		log.Fatal().Err(err).Msg("failed to get database connection")
 	}
+
 	defer mainDB.Close()
 	gin.SetMode(cfg.Server.GinMode)
 
-	srv := server.New(cfg, db, log)
+	srv := server.New(cfg, db, &log)
 
 	router := srv.SetupRoutes()
 
@@ -61,9 +65,9 @@ func main() {
 	defer cancel()
 
 	if err := httpServer.Shutdown(ctx); err != nil {
-		log.Fatal().Err(err).Msg("failed to shutdown http server")
+		log.Error().Err(err).Msg("failed to shutdown http server")
+		return
 	}
 
 	log.Info().Msg("shutting down database")
-
 }
