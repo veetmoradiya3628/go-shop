@@ -14,6 +14,7 @@ import (
 	"github.com/veetmoradiya3628/go-shop/internal/config"
 	"github.com/veetmoradiya3628/go-shop/internal/database"
 	"github.com/veetmoradiya3628/go-shop/internal/logger"
+	"github.com/veetmoradiya3628/go-shop/internal/providers"
 	"github.com/veetmoradiya3628/go-shop/internal/server"
 	"github.com/veetmoradiya3628/go-shop/internal/services"
 )
@@ -42,8 +43,9 @@ func main() {
 	authService := services.NewAuthService(db, cfg)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
+	uploadService := services.NewUploadService(providers.NewLocalProvider(cfg.Upload.Path)) // Use local provider for uploads
 
-	srv := server.New(cfg, db, &log, authService, productService, userService)
+	srv := server.New(cfg, db, &log, authService, productService, userService, uploadService)
 
 	router := srv.SetupRoutes()
 
