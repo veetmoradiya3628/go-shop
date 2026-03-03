@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/veetmoradiya3628/go-shop/internal/config"
 	"github.com/veetmoradiya3628/go-shop/internal/database"
+	"github.com/veetmoradiya3628/go-shop/internal/interfaces"
 	"github.com/veetmoradiya3628/go-shop/internal/logger"
 	"github.com/veetmoradiya3628/go-shop/internal/providers"
 	"github.com/veetmoradiya3628/go-shop/internal/server"
@@ -43,7 +44,14 @@ func main() {
 	authService := services.NewAuthService(db, cfg)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
-	uploadService := services.NewUploadService(providers.NewLocalProvider(cfg.Upload.Path)) // Use local provider for uploads
+
+	var uploadProvider interfaces.UploadProvider
+	if cfg.Upload.UploadProvider == "s3" {
+		uploadProvider = providers.NewS3Provider(cfg)
+	} else {
+		uploadProvider = providers.NewLocalProvider(cfg.Upload.Path)
+	}
+	uploadService := services.NewUploadService(uploadProvider) // Use the selected provider for uploads
 
 	srv := server.New(cfg, db, &log, authService, productService, userService, uploadService)
 
