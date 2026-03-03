@@ -11,15 +11,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # cdn:
-  #   image: nginx:alpine
-  #   ports:
-  #     - "8081:80"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #     - ../uploads:/var/www/uploads
-  #   depends_on:
-  #     - localstack
+  cdn:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../uploads:/var/www/uploads
+    depends_on:
+      - localstack
 
   # mailpit:
   #   image: axllent/mailpit:v1.27
