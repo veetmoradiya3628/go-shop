@@ -8,7 +8,11 @@ import (
 	"github.com/veetmoradiya3628/go-shop/internal/services"
 
 	"github.com/rs/zerolog"
+	_ "github.com/veetmoradiya3628/go-shop/docs"
 	"gorm.io/gorm"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -56,6 +60,12 @@ func (s *Server) SetupRoutes() *gin.Engine {
 
 	// Add routes
 	router.GET("/health", s.healthCheck)
+
+	// Add documentation routes
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.StaticFile("/api-docs", "./docs/rapiddocs.html")
+
 	router.Static("/uploads", "./uploads")
 
 	api := router.Group("/api/v1")
