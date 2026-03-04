@@ -52,8 +52,9 @@ func main() {
 		uploadProvider = providers.NewLocalProvider(cfg.Upload.Path)
 	}
 	uploadService := services.NewUploadService(uploadProvider) // Use the selected provider for uploads
+	cartService := services.NewCartService(db)
 
-	srv := server.New(cfg, db, &log, authService, productService, userService, uploadService)
+	srv := server.New(cfg, db, &log, authService, productService, userService, uploadService, cartService)
 
 	router := srv.SetupRoutes()
 
