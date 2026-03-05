@@ -7,20 +7,23 @@ import (
 
 	"github.com/veetmoradiya3628/go-shop/internal/config"
 	"github.com/veetmoradiya3628/go-shop/internal/dto"
+	"github.com/veetmoradiya3628/go-shop/internal/events"
 	"github.com/veetmoradiya3628/go-shop/internal/models"
 	"github.com/veetmoradiya3628/go-shop/internal/utils"
 	"gorm.io/gorm"
 )
 
 type AuthService struct {
-	db     *gorm.DB
-	config *config.Config
+	db             *gorm.DB
+	config         *config.Config
+	eventPublisher events.Publisher
 }
 
-func NewAuthService(db *gorm.DB, config *config.Config) *AuthService {
+func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
-		db:     db,
-		config: config,
+		db:             db,
+		config:         config,
+		eventPublisher: eventPublisher,
 	}
 }
 
@@ -111,6 +114,12 @@ func (s *AuthService) generateAuthResponse(user *models.User) (*dto.AuthResponse
 	if err := s.db.Create(&refreshTokenModel).Error; err != nil {
 		return nil, err
 	}
+
+	err = s.eventPublisher.Publish("USER_LOGGED_IN", user, map[string]string{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to publish user login event: %w", err)
+	}
+
 	return &dto.AuthResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

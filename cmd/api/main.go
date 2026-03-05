@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/veetmoradiya3628/go-shop/internal/config"
 	"github.com/veetmoradiya3628/go-shop/internal/database"
+	"github.com/veetmoradiya3628/go-shop/internal/events"
 	"github.com/veetmoradiya3628/go-shop/internal/interfaces"
 	"github.com/veetmoradiya3628/go-shop/internal/logger"
 	"github.com/veetmoradiya3628/go-shop/internal/providers"
@@ -59,9 +60,16 @@ func main() {
 	}
 
 	defer mainDB.Close()
+
+	ctx := context.Background()
+	eventPublisher, err := events.NewEventPublisher(ctx, &cfg.AWS)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to create event connection")
+	}
+
 	gin.SetMode(cfg.Server.GinMode)
 
-	authService := services.NewAuthService(db, cfg)
+	authService := services.NewAuthService(db, cfg, eventPublisher)
 	productService := services.NewProductService(db)
 	userService := services.NewUserService(db)
 
