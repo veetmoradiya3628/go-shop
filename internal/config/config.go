@@ -42,6 +42,7 @@ type AWSConfig struct {
 	SecretAccessKey string
 	S3Bucket        string
 	S3Endpoint      string
+	EventQueueName  string
 }
 
 type UploadConfig struct {
@@ -81,6 +82,7 @@ func Load() (*Config, error) {
 			SecretAccessKey: getEnv("AWS_SECRET_ACCESS_KEY", ""),
 			S3Bucket:        getEnv("AWS_S3_BUCKET", ""),
 			S3Endpoint:      getEnv("AWS_S3_ENDPOINT", ""),
+			EventQueueName:  getEnv("AWS_EVENT_QUEUE_NAME", "ecommerce-events"),
 		},
 		Upload: UploadConfig{
 			Path:           getEnv("UPLOAD_PATH", "./uploads"),
