@@ -9,6 +9,7 @@ import (
 	"github.com/veetmoradiya3628/go-shop/internal/dto"
 	"github.com/veetmoradiya3628/go-shop/internal/events"
 	"github.com/veetmoradiya3628/go-shop/internal/models"
+	"github.com/veetmoradiya3628/go-shop/internal/notifications"
 	"github.com/veetmoradiya3628/go-shop/internal/utils"
 	"gorm.io/gorm"
 )
@@ -115,7 +116,7 @@ func (s *AuthService) generateAuthResponse(user *models.User) (*dto.AuthResponse
 		return nil, err
 	}
 
-	err = s.eventPublisher.Publish("USER_LOGGED_IN", user, map[string]string{})
+	err = s.eventPublisher.Publish(notifications.UserLoggedIn, user, map[string]string{})
 	if err != nil {
 		return nil, fmt.Errorf("unable to publish user login event: %w", err)
 	}
