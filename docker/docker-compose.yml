@@ -58,45 +58,52 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - localstack
+      postgres:
+        condition: service_started
+      localstack:
+        condition: service_healthy
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_NAME=ecommerce
+      - DB_NAME=ecommerce_shop
       - AWS_S3_ENDPOINT=http://localstack:4566
+      - AWS_EVENT_QUEUE_NAME=ecommerce-events
       - AWS_REGION=us-east-1
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@shop.com
-    command: [ "./api" ]
+    command: ["./api"]
 
   notifier:
     build:
       context: ..
       dockerfile: docker/Dockerfile
     depends_on:
-      - postgres
-      - localstack
-      - mailpit
+      postgres:
+        condition: service_started
+      localstack:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
       - DB_PASSWORD=password
-      - DB_NAME=ecommerce
+      - DB_NAME=ecommerce_shop
       - AWS_S3_ENDPOINT=http://localstack:4566
+      - AWS_EVENT_QUEUE_NAME=ecommerce-events
       - AWS_REGION=us-east-1
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@shop.com
-    command: [ "./notifier" ]
+    command: ["./notifier"]
     deploy:
       replicas: 1
 
 volumes:
-    postgres_data:
-    localstack_data:
-    mailpit_data:
+  postgres_data:
+  localstack_data:
+  mailpit_data:
